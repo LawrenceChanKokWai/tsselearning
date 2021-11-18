@@ -28,7 +28,10 @@ const startApp = async () => {
 
 		//Start listening for the server on PORT
 		app.listen(PORT, () =>
-			success({ message: `Server has started in PORT ${PORT}`, badge: true }),
+			success({
+				message: `Server has started in PORT ${PORT}, \nhttp://localhost:8000`,
+				badge: true,
+			}),
 		);
 	} catch (err) {
 		error({

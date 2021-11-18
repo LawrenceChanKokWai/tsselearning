@@ -1,6 +1,12 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
+const { SECRET } = require("../config");
+
+{
+	/* =================REGISTER FUNCTION============================= */
+}
 /**
  * @DESC To register the user (SUPER_ADMIN, ADMIN, USER)
  */
@@ -47,6 +53,63 @@ const userRegister = async (userDets, role, response) => {
 	}
 };
 
+{
+	/* =================LOG-IN FUNCTION============================= */
+}
+/**
+ * @DESC To login the user (SUPER_ADMIN, ADMIN, USER)
+ */
+const userLogin = async (userCreds, role, response) => {
+	let { username, password } = userCreds;
+	//check if username is in the database
+	const user = await User.findOne({ username });
+	if (!user) {
+		return response.status(404).json({
+			message: "Username is not found, Invalid login credentials!",
+			success: false,
+		});
+	}
+	//check username on the role
+	if (user.role !== role) {
+		return response.status(403).json({
+			message: "Please make sure you are logging in from the right portal",
+			success: false,
+		});
+	}
+	//above passed -> user exist, now check the password
+	let isMatch = await bcrypt.compare(password, user.password);
+	if (isMatch) {
+		//sign in the token , issue to the user.
+		let token = jwt.sign(
+			{
+				user_id: user._id,
+				role: user.role,
+				username: user.username,
+				email: user.email,
+			},
+			SECRET,
+			{ expiresIn: "7 days" },
+		);
+		let result = {
+			username: user.username,
+			role: user.role,
+			email: user.email,
+			token: `Bearer ${token}`,
+			expiresIn: 168,
+		};
+		return response.status(200).json({
+			...result,
+			message: "You are now logged in!",
+			success: true,
+		});
+	} else {
+		return response.status(403).json({
+			message: "INCORRECT Password!",
+			success: false,
+		});
+	}
+};
+
 const validateUsername = async (username) => {
 	let user = await User.findOne({ username });
 	return user ? false : true;
@@ -61,4 +124,4 @@ const validateEmail = async (email) => {
 	return user ? false : true;
 };
 
-module.exports = { userRegister };
+module.exports = { userRegister, userLogin };
