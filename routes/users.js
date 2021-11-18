@@ -1,13 +1,21 @@
 const router = require("express").Router();
+//import User Registeration function
+const { userRegister } = require("../utils/Auth");
 
 // User Register Route
-router.post("/register-user", async (request, response) => {});
+router.post("/register-user", async (request, response) => {
+	await userRegister(request.body, "user", response);
+});
 
 // Admin Register Route
-router.post("/register-admin", async (request, response) => {});
+router.post("/register-admin", async (request, response) => {
+	await userRegister(request.body, "admin", response);
+});
 
 // Super Admin Register Route
-router.post("/register-super-admin", async (request, response) => {});
+router.post("/register-super-admin", async (request, response) => {
+	await userRegister(request.body, "superadmin", response);
+});
 
 // User Login Route
 router.post("/login-user", async (request, response) => {});
@@ -18,13 +26,16 @@ router.post("/login-admin", async (request, response) => {});
 // Super Admin Login Route
 router.post("/login-super-admin", async (request, response) => {});
 
+//Common Profile Route
+router.post("/profile", async (request, response) => {});
+
 // User Protected Route
-router.post("/user-profile", async (request, response) => {});
+router.post("/user-protected", async (request, response) => {});
 
 // Admin Protected Route
-router.post("/admin-profile", async (request, response) => {});
+router.post("/admin-protected", async (request, response) => {});
 
 // Super Protected Login Route
-router.post("/super-admin-profile", async (request, response) => {});
+router.post("/super-admin-protected", async (request, response) => {});
 
 module.exports = router;
